@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import technicalblog.model.Post;
 import technicalblog.model.User;
 import technicalblog.service.PostService;
+import technicalblog.service.UserService;
 
 import java.util.ArrayList;
 
@@ -15,6 +16,8 @@ import java.util.ArrayList;
 public class UserController {
     @Autowired
     private PostService postService;
+    @Autowired
+    private UserService userService;
 
     @RequestMapping("users/login")
     public String login() {
@@ -29,7 +32,12 @@ public class UserController {
     @RequestMapping(value = "users/login" , method= RequestMethod.POST)
     public String loginUser(User user) {  //from the form, all data will be captured in user object and comes here.
 
-        return "redirect:/posts";   //this will be the page a user see when he logs in..
+        if(userService.login(user)) {
+            return "redirect:/posts";
+        }
+        else {
+            return "users/login";
+        }
     }
 
     @RequestMapping(value = "users/logout" , method= RequestMethod.POST)
@@ -37,5 +45,10 @@ public class UserController {
         ArrayList<Post> posts  = postService.getAllPosts();
         model.addAttribute("posts", posts);
         return "index";   // on clicking logout button, it shall show home page
+    }
+
+    @RequestMapping(value = "users/registration", method=RequestMethod.POST)
+    public String registerUser(User user) {
+        return "users/login";
     }
 }
